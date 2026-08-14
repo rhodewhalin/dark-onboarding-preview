@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>다크 온보딩 RPG — 4080 인게임 프리뷰 (3070 핑퐁)</title>
+<style>
+  body { font-family: system-ui, sans-serif; background:#14121a; color:#e8e2f4; margin:0; padding:1.2rem; }
+  h1 { font-size:1.1rem; margin:0 0 .3rem; }
+  .sub { color:#9a92b0; font-size:.85rem; margin-bottom:1rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(420px,1fr)); gap:12px; }
+  figure { margin:0; background:#1c1926; border:1px solid #2c2740; border-radius:8px; overflow:hidden; }
+  figure img { width:100%; display:block; }
+  figcaption { padding:.4rem .6rem; font-size:.85rem; color:#c8bfe0; }
+  h2 { font-size:.95rem; margin:1.6rem 0 .5rem; color:#b9a8e8; }
+  pre { background:#1c1926; border:1px solid #2c2740; border-radius:8px; padding:1rem; white-space:pre-wrap;
+        font-size:.82rem; line-height:1.5; color:#d6cfe8; overflow-x:auto; }
+  .stamp { color:#7f7896; font-size:.75rem; }
+</style>
+</head>
+<body>
+<h1>다크 온보딩 RPG — 4080 인게임 왕국 렌더</h1>
+<div class="sub">3070 ↔ 4080 핑퐁 라이브 프리뷰 · <span class="stamp" id="stamp"></span> · 8초마다 자동 새로고침</div>
+<div class="grid" id="grid"></div>
+
+<h2>킷 피드백 채널 (kit-feedback.md)</h2>
+<pre id="fb">불러오는 중…</pre>
+
+<script>
+const realms = [
+  ["realm-oathbound-keep.png", "서약의 성채 (따뜻)"],
+  ["realm-beacon-marches.png", "봉화 변경"],
+  ["realm-patentnet-citadel.png", "특허그물 성 (청록)"],
+  ["realm-cognition-spire.png", "인지 첨탑 (보라)"],
+  ["realm-archive-meridian.png", "기록 자오선"],
+];
+const grid = document.getElementById("grid");
+function render() {
+  const t = Date.now();
+  grid.innerHTML = "";
+  for (const [src, name] of realms) {
+    const fig = document.createElement("figure");
+    fig.innerHTML = `<img src="${src}?t=${t}" alt="${name}"><figcaption>${name}</figcaption>`;
+    grid.appendChild(fig);
+  }
+  document.getElementById("stamp").textContent = new Date().toLocaleTimeString();
+  fetch("kit-feedback.md?t=" + t).then(r => r.text()).then(x => {
+    document.getElementById("fb").textContent = x;
+  }).catch(() => {});
+}
+render();
+setInterval(render, 8000);
+</script>
+</body>
+</html>
