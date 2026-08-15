@@ -54,6 +54,19 @@
   .step .badge { margin-left:0; }
   .foot { color:var(--dim); font-size:12px; padding:0 20px 40px; max-width:900px; }
   .stamp { color:var(--dim); font-size:12px; }
+  .loopwrap { border:1px solid var(--edge); border-radius:12px; background:var(--panel); padding:14px 16px; }
+  .loopwrap h3 { margin:0 0 4px; font-size:15px; }
+  .hook { color:var(--run); font-size:12px; margin-left:8px; }
+  .loopsub { color:var(--dim); font-size:12.5px; margin-bottom:10px; }
+  .ttl { overflow-x:auto; }
+  .loopwrap table { border-collapse:collapse; width:100%; font-size:12px; min-width:760px; }
+  .loopwrap th, .loopwrap td { border:1px solid var(--edge); padding:5px 7px; text-align:center; }
+  .loopwrap th { color:var(--dim); font-weight:600; background:#181b22; }
+  .loopwrap td.lts { color:var(--dim); font:11px ui-monospace,Menlo,Consolas,monospace; white-space:nowrap; }
+  .loopwrap td.act { text-align:left; color:var(--ink); }
+  .loopwrap td.v.met  { color:var(--done); }
+  .loopwrap td.v.part { color:var(--hot); }
+  .loopwrap td.v.fail { color:#e06a6a; font-weight:600; }
 </style>
 </head>
 <body>
@@ -69,13 +82,27 @@
 
 <div class="goal" id="goal"></div>
 
+<div class="wrap"><div id="looplog"></div></div>
+
 <div class="wrap" id="wrap"></div>
 
 <div class="foot" id="foot"></div>
 
 <script>
 // ── plan data (edited each wave; status: done | run | wait) ─────────────────────────────
-const UPDATED = "2026-08-16 02:15 · 야근 웨이브 4 (예산 트림 + 성벽 유기화 + 실행로그 타임스탬프)";
+const UPDATED = "2026-08-16 03:05 · 야근 웨이브 5 (도심 물 인지 재정렬 + §4W.1 정련 루프 상시 가동)";
+// §4W.1 refinement loop — a running verification HOOK (codex scores the 6 criteria each wave).
+// This is the "loop" of the paper's Stage 2.3; it does not stall — each iteration logs verdicts,
+// the lowest criterion becomes the next action, and the fix is verified in the next iteration.
+const CRIT = ["지질정합성","재질구역","물신뢰성","접지","무아티팩트","기능구역"];
+const LOOPLOG = [
+  { iter:1, ts:"2026-08-16 02:40", scores:["PARTIAL","PARTIAL","PARTIAL","MET","PARTIAL","FAIL"],
+    priority:"기능구역", action:"성벽 사각형 깨고 수변 게이트+부두+창고를 물에 정렬" },
+  { iter:2, ts:"2026-08-16 02:55", scores:["PARTIAL","PARTIAL","PARTIAL","MET","PARTIAL","PARTIAL"],
+    priority:"물신뢰성", action:"수변 게이트+부두 편입으로 기능구역 FAIL→PARTIAL. 다음: 연속적 물가·번짐 제거·부두를 수면 위 기둥 데크로" },
+  { iter:3, ts:"2026-08-16 03:05", scores:["PARTIAL","PARTIAL","PARTIAL→개선","MET","PARTIAL","PARTIAL"],
+    priority:"(재검증 대기)", action:"물을 의도 강·호수로 한정(번짐 제거)+부두 수면 위로. 다음 웨이브 codex 재채점 예정" },
+];
 const GOAL = "<b>이번 야근 목표:</b> Figure 1의 <b>Stage 1(Intent Analysis &amp; Planning)</b>을 thorough 하게 다시 세우고, <b>Stage 2 하위 3단계(Scene Terrain Generation &amp; Refinement)</b>까지 진행한다. 계기: 침식 버전이 여태 최선이나 ①좁은 타일에 과도한 고지대 ②맵에 물이 전혀 없음 — 되짚어 보니 <b>Stage 1을 건너뛰어</b> 지형 범주(특히 물)를 의도에서 유도하지 않고 건물 중심 분할로 직행한 게 근본 원인.";
 const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
 
@@ -140,7 +167,7 @@ const STEPS = [
 
  { stage:"Stage 3 — Regional Object Generation & Placement", status:"run",
    title:"3.2 Terrain-Aware Rendering & Placement — 구역별 지형 인지 배치",
-   body:`<p>오브젝트를 <b>지형·물을 인지해</b> 배치. ✔ 수변: 은행 접지(경사 검사)·부두는 수면 위·건물은 물 밖. ✔ 지면식생 <code>scrub_tuft</code>로 식생 구역을 기하로. 남음: 도심 구역 자체를 물·새 지형에 맞춰 재정렬(성벽 유기화 ✔ 02:15).</p>`, ts:"2026-08-16 02:15" },
+   body:`<p>오브젝트를 <b>지형·물을 인지해</b> 배치. ✔ 수변: 은행 접지(경사 검사)·부두는 수면 위·건물은 물 밖. ✔ 지면식생 <code>scrub_tuft</code>로 식생 구역을 기하로. ✔ <b>수변 게이트 + 부두 창고 구역</b>(03:00)으로 도심을 물에 연결(기능구역 FAIL→PARTIAL). 남음: 광장·주거·보급 구역도 물·경사 등고선 따라 정렬.</p>`, ts:"2026-08-16 03:00" },
 
  { stage:"Stage 3 — Regional Object Generation & Placement", status:"run",
    title:"3.3 Scene Refinement — 구역별 정련 루프 (pose/scale/collision/quality)",
@@ -149,6 +176,20 @@ const STEPS = [
 
 const ICON = {done:"완료", run:"진행 중", wait:"대기"};
 document.getElementById("goal").innerHTML = GOAL;
+// render the §4W.1 refinement-loop log (running verification hook)
+(function(){
+  var vcls = function(v){ return v.indexOf("MET")>=0?"met":(v.indexOf("FAIL")>=0?"fail":"part"); };
+  var head = "<tr><th>#</th><th>시각</th>" + CRIT.map(function(c){return "<th>"+c+"</th>";}).join("") + "<th>다음 우선/액션</th></tr>";
+  var rows = LOOPLOG.map(function(r){
+    return "<tr><td>"+r.iter+"</td><td class='lts'>"+r.ts+"</td>"
+      + r.scores.map(function(v){return "<td class='v "+vcls(v)+"'>"+v+"</td>";}).join("")
+      + "<td class='act'><b>"+r.priority+"</b> · "+r.action+"</td></tr>";
+  }).join("");
+  document.getElementById("looplog").innerHTML =
+    "<div class='loopwrap'><h3>§4W.1 정련 루프 로그 <span class='hook'>● 상시 가동(hook)</span></h3>"
+    + "<div class='loopsub'>논문 Stage 2.3의 반복 루프. 매 웨이브 codex가 6개 수용 기준을 채점 → 최저 항목이 다음 액션 → 다음 반복에서 검증. 멈추지 않는다.</div>"
+    + "<div class='ttl'><table>"+head+rows+"</table></div></div>";
+})();
 document.getElementById("foot").innerHTML = FOOT + "<div class='stamp' style='margin-top:10px'>갱신: " + UPDATED + "</div>";
 const wrap = document.getElementById("wrap");
 let lastStage = "";
