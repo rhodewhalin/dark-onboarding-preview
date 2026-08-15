@@ -1,54 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8" />
-<title>다크 온보딩 RPG — 4080 인게임 프리뷰 (3070 핑퐁)</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dark-onboarding-rpg — 라이브 맵 프리뷰</title>
 <style>
-  body { font-family: system-ui, sans-serif; background:#14121a; color:#e8e2f4; margin:0; padding:1.2rem; }
-  h1 { font-size:1.1rem; margin:0 0 .3rem; }
-  .sub { color:#9a92b0; font-size:.85rem; margin-bottom:1rem; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(420px,1fr)); gap:12px; }
-  figure { margin:0; background:#1c1926; border:1px solid #2c2740; border-radius:8px; overflow:hidden; }
-  figure img { width:100%; display:block; }
-  figcaption { padding:.4rem .6rem; font-size:.85rem; color:#c8bfe0; }
-  h2 { font-size:.95rem; margin:1.6rem 0 .5rem; color:#b9a8e8; }
-  pre { background:#1c1926; border:1px solid #2c2740; border-radius:8px; padding:1rem; white-space:pre-wrap;
-        font-size:.82rem; line-height:1.5; color:#d6cfe8; overflow-x:auto; }
-  .stamp { color:#7f7896; font-size:.75rem; }
+  :root { --bg:#14161c; --panel:#1c1f27; --edge:#2c3040; --ink:#e8e2d0; --dim:#9a94a6; --hot:#c98a3a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif; }
+  header { padding:18px 20px 10px; border-bottom:1px solid var(--edge); }
+  h1 { margin:0 0 4px; font-size:20px; letter-spacing:.3px; }
+  .sub { color:var(--dim); font-size:13px; }
+  .bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding:14px 20px; position:sticky; top:0;
+         background:var(--bg); border-bottom:1px solid var(--edge); z-index:5; }
+  .bar .lbl { color:var(--dim); font-size:13px; margin-right:4px; }
+  button.vp { background:var(--panel); color:var(--ink); border:1px solid var(--edge);
+              border-radius:8px; padding:8px 14px; cursor:pointer; font-size:14px; transition:.15s; }
+  button.vp:hover { border-color:var(--hot); }
+  button.vp.on { background:var(--hot); color:#1a1206; border-color:var(--hot); font-weight:600; }
+  .updated { margin-left:auto; color:var(--dim); font-size:12px; }
+  .grid { display:grid; gap:14px; padding:18px 20px 40px;
+          grid-template-columns:repeat(auto-fit,minmax(380px,1fr)); }
+  .card { background:var(--panel); border:1px solid var(--edge); border-radius:12px; overflow:hidden; }
+  .card .cap { display:flex; justify-content:space-between; align-items:baseline; padding:10px 12px 8px; }
+  .card .cap b { font-size:15px; }
+  .card .cap span { color:var(--dim); font-size:12px; }
+  .card .frame { position:relative; aspect-ratio:16/9; background:#0c0d11; cursor:zoom-in; }
+  .card img { width:100%; height:100%; object-fit:cover; display:block; }
+  .card .tag { position:absolute; left:8px; bottom:8px; background:rgba(0,0,0,.55);
+               border:1px solid var(--edge); border-radius:6px; padding:2px 8px; font-size:11px; color:var(--ink); }
+  #lightbox { position:fixed; inset:0; background:rgba(6,7,10,.94); display:none; align-items:center;
+              justify-content:center; z-index:20; cursor:zoom-out; padding:20px; }
+  #lightbox img { max-width:100%; max-height:100%; border-radius:8px; }
+  .note { color:var(--dim); font-size:12px; padding:0 20px 30px; max-width:900px; }
 </style>
 </head>
 <body>
-<h1>다크 온보딩 RPG — 4080 인게임 왕국 렌더</h1>
-<div class="sub">3070 ↔ 4080 핑퐁 라이브 프리뷰 · <span class="stamp" id="stamp"></span> · 8초마다 자동 새로고침</div>
+<header>
+  <h1>dark-onboarding-rpg — 라이브 맵 프리뷰</h1>
+  <div class="sub">5왕국을 시점 전환하며 한 번에 봅니다. 렌더가 갱신되면 자동 반영(30초마다).</div>
+</header>
+<div class="bar">
+  <span class="lbl">시점</span>
+  <button class="vp on" data-vp="MAP">부감 (전체 맵)</button>
+  <button class="vp" data-vp="EST">확립샷 (플레이어 시점)</button>
+  <button class="vp" data-vp="VISTA">지평선 (경계 너머)</button>
+  <span class="updated" id="updated"></span>
+</div>
 <div class="grid" id="grid"></div>
-
-<h2>킷 피드백 채널 (kit-feedback.md)</h2>
-<pre id="fb">불러오는 중…</pre>
-
+<div class="note">
+  부감(MAP)은 "복도가 아니라 맵인가?"를 보는 뷰 — 중앙 순환 스파인 + 구역별 건물 지구 + 주변 상승 지형.
+  각 왕국은 아키타입별로 건물 실루엣(타운하우스·코티지·블록·타워·긴 홀)과 팔레트가 달라 서로 다른 공간으로 읽힙니다.
+</div>
+<div id="lightbox"><img id="lbimg" alt=""></div>
 <script>
-const realms = [
-  ["realm-oathbound-keep.png", "서약의 성채 (따뜻)"],
-  ["realm-beacon-marches.png", "봉화 변경"],
-  ["realm-patentnet-citadel.png", "특허그물 성 (청록)"],
-  ["realm-cognition-spire.png", "인지 첨탑 (보라)"],
-  ["realm-archive-meridian.png", "기록 자오선"],
-];
-const grid = document.getElementById("grid");
-function render() {
-  const t = Date.now();
-  grid.innerHTML = "";
-  for (const [src, name] of realms) {
-    const fig = document.createElement("figure");
-    fig.innerHTML = `<img src="${src}?t=${t}" alt="${name}"><figcaption>${name}</figcaption>`;
-    grid.appendChild(fig);
+  var REALMS = [
+    {id:"oathbound-keep",   name:"오소본드 성채",  arch:"core_radial · 타운하우스"},
+    {id:"beacon-marches",   name:"봉화 변경",      arch:"frontier_scatter · 낮은 코티지"},
+    {id:"patentnet-citadel",name:"특허그물 성",    arch:"wall_lattice · 균일 블록"},
+    {id:"cognition-spire",  name:"인지 첨탑",      arch:"vertical_terrace · 높은 타워"},
+    {id:"archive-meridian", name:"기록 자오선",    arch:"linear_axis · 긴 홀"}
+  ];
+  var vp = "MAP", grid = document.getElementById("grid");
+  function stamp(){ return "?t=" + Math.floor(Date.now()/30000); }  // 30s cache-bust bucket
+  function render(){
+    grid.innerHTML = "";
+    REALMS.forEach(function(r){
+      var src = "realm-" + r.id + "-" + vp + ".png" + stamp();
+      var card = document.createElement("div"); card.className = "card";
+      card.innerHTML =
+        '<div class="cap"><b>'+r.name+'</b><span>'+r.arch+'</span></div>' +
+        '<div class="frame"><img src="'+src+'" alt="'+r.name+'"><span class="tag">'+vp+'</span></div>';
+      card.querySelector(".frame").addEventListener("click", function(){
+        var lb = document.getElementById("lightbox");
+        document.getElementById("lbimg").src = src;
+        lb.style.display = "flex";
+      });
+      grid.appendChild(card);
+    });
+    document.getElementById("updated").textContent = "갱신 " + new Date().toLocaleTimeString("ko-KR");
   }
-  document.getElementById("stamp").textContent = new Date().toLocaleTimeString();
-  fetch("kit-feedback.md?t=" + t).then(r => r.text()).then(x => {
-    document.getElementById("fb").textContent = x;
-  }).catch(() => {});
-}
-render();
-setInterval(render, 8000);
+  document.querySelectorAll("button.vp").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("button.vp").forEach(function(x){ x.classList.remove("on"); });
+      b.classList.add("on"); vp = b.dataset.vp; render();
+    });
+  });
+  document.getElementById("lightbox").addEventListener("click", function(){ this.style.display="none"; });
+  render();
+  setInterval(render, 30000);
 </script>
 </body>
 </html>
