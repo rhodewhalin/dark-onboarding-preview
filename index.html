@@ -33,7 +33,14 @@
   #lightbox { position:fixed; inset:0; background:rgba(6,7,10,.94); display:none; align-items:center;
               justify-content:center; z-index:20; cursor:zoom-out; padding:20px; }
   #lightbox img { max-width:100%; max-height:100%; border-radius:8px; }
-  .note { color:var(--dim); font-size:12px; padding:0 20px 30px; max-width:900px; }
+  .note { color:var(--dim); font-size:12px; padding:0 20px 20px; max-width:900px; }
+  .feedback { margin:0 20px 40px; border:1px solid var(--edge); border-radius:12px; background:var(--panel); overflow:hidden; }
+  .feedback > summary { cursor:pointer; padding:12px 16px; font-weight:600; list-style:none; user-select:none; }
+  .feedback > summary::before { content:"▸ "; color:var(--hot); }
+  .feedback[open] > summary::before { content:"▾ "; }
+  .feedback pre { margin:0; padding:8px 16px 18px; max-height:420px; overflow:auto; white-space:pre-wrap;
+                  word-break:break-word; font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+                  color:var(--ink); border-top:1px solid var(--edge); }
 </style>
 </head>
 <body>
@@ -53,8 +60,19 @@
   부감(MAP)은 "복도가 아니라 맵인가?"를 보는 뷰 — 중앙 순환 스파인 + 구역별 건물 지구 + 주변 상승 지형.
   각 왕국은 아키타입별로 건물 실루엣(타운하우스·코티지·블록·타워·긴 홀)과 팔레트가 달라 서로 다른 공간으로 읽힙니다.
 </div>
+<details class="feedback" id="fb">
+  <summary># 킷 아트 핑퐁 피드백 채널 (4080 ↔ 3070)</summary>
+  <pre id="fbtext">불러오는 중…</pre>
+</details>
 <div id="lightbox"><img id="lbimg" alt=""></div>
 <script>
+  function loadFeedback(){
+    fetch("kit-feedback.md?t=" + Math.floor(Date.now()/30000))
+      .then(function(r){ return r.ok ? r.text() : Promise.reject(r.status); })
+      .then(function(t){ document.getElementById("fbtext").textContent = t; })
+      .catch(function(e){ document.getElementById("fbtext").textContent = "kit-feedback.md 로드 실패 (" + e + ")"; });
+  }
+  loadFeedback(); setInterval(loadFeedback, 30000);
   var REALMS = [
     {id:"oathbound-keep",   name:"오소본드 성채",  arch:"core_radial · 타운하우스"},
     {id:"beacon-marches",   name:"봉화 변경",      arch:"frontier_scatter · 낮은 코티지"},
