@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dark-onboarding-rpg — 월드 생성 계획 (WorldClaw 정렬)</title>
+<style>
+  :root { --bg:#14161c; --panel:#1c1f27; --panel2:#22262f; --edge:#2c3040; --ink:#e8e2d0; --dim:#9a94a6;
+          --hot:#c98a3a; --done:#5fae6a; --run:#4a9be0; --wait:#6b6577; --strike:#6f6a5a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif; }
+  header { padding:18px 20px 12px; border-bottom:1px solid var(--edge); }
+  h1 { margin:0 0 4px; font-size:20px; letter-spacing:.3px; }
+  .sub { color:var(--dim); font-size:13px; max-width:900px; }
+  .nav { padding:12px 20px; border-bottom:1px solid var(--edge); display:flex; gap:10px; flex-wrap:wrap; }
+  .nav a { color:var(--ink); text-decoration:none; background:var(--panel); border:1px solid var(--edge);
+           border-radius:8px; padding:7px 13px; font-size:14px; }
+  .nav a:hover { border-color:var(--hot); }
+  .nav a.here { background:var(--hot); color:#1a1206; font-weight:600; border-color:var(--hot); }
+  .goal { margin:16px 20px; padding:14px 16px; background:var(--panel2); border:1px solid var(--edge);
+          border-left:3px solid var(--hot); border-radius:10px; font-size:14px; }
+  .goal b { color:var(--hot); }
+  .wrap { padding:6px 20px 60px; max-width:1000px; }
+  .stage { margin:22px 0 8px; font-size:13px; letter-spacing:.5px; color:var(--dim); text-transform:uppercase; }
+  .step { border:1px solid var(--edge); border-radius:12px; background:var(--panel); margin:10px 0; overflow:hidden; }
+  .step > summary { cursor:pointer; list-style:none; user-select:none; padding:13px 15px;
+                    display:flex; align-items:center; gap:12px; }
+  .step > summary::-webkit-details-marker { display:none; }
+  .dot { width:11px; height:11px; border-radius:50%; flex:0 0 auto; }
+  .st-done .dot { background:var(--done); box-shadow:0 0 0 3px rgba(95,174,106,.18); }
+  .st-run .dot  { background:var(--run); box-shadow:0 0 0 3px rgba(74,155,224,.22); animation:pulse 1.6s infinite; }
+  .st-wait .dot { background:var(--wait); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .step .tt { font-weight:600; font-size:15px; }
+  .step .badge { margin-left:auto; font-size:11px; padding:3px 9px; border-radius:20px; border:1px solid var(--edge); color:var(--dim); }
+  .st-done .badge { color:var(--done); border-color:rgba(95,174,106,.4); }
+  .st-run .badge  { color:var(--run);  border-color:rgba(74,155,224,.4); }
+  .step .body { padding:2px 16px 16px 38px; border-top:1px solid var(--edge); color:var(--ink); font-size:14px; }
+  .step .body p { margin:10px 0; }
+  .step .body ul { margin:8px 0; padding-left:18px; }
+  .step .body li { margin:4px 0; }
+  .step .body code { background:#0f1116; border:1px solid var(--edge); border-radius:4px; padding:1px 5px; font-size:12.5px; }
+  .rev { margin-top:12px; padding:10px 12px; background:#181b22; border:1px dashed var(--edge); border-radius:8px; font-size:13px; }
+  .rev h4 { margin:0 0 6px; font-size:12px; color:var(--dim); letter-spacing:.4px; text-transform:uppercase; }
+  .rev .old { color:var(--strike); text-decoration:line-through; }
+  .rev .new { color:var(--done); }
+  .rev div { margin:4px 0; }
+  .foot { color:var(--dim); font-size:12px; padding:0 20px 40px; max-width:900px; }
+  .stamp { color:var(--dim); font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>월드 생성 계획 — WorldClaw 파이프라인 정렬</h1>
+  <div class="sub">논문(arXiv:2608.05248)의 coarse-to-fine agentic framework를 우리 제출 스펙(Unity WebGL·저폴리·팔레트 4색)에 맞춰 스케일다운해 따라간다. 아래는 실행 계획과 현재 진행 지점. 각 단계를 눌러 상세를 본다. 계획이 바뀌면 과거 결정은 <span style="text-decoration:line-through;color:var(--strike)">취소선</span>으로 남기고 쌓는다.</div>
+</header>
+<div class="nav">
+  <a href="index.html">← 라이브 맵</a>
+  <a href="plan.html" class="here">월드 생성 계획</a>
+</div>
+
+<div class="goal" id="goal"></div>
+
+<div class="wrap" id="wrap"></div>
+
+<div class="foot" id="foot"></div>
+
+<script>
+// ── plan data (edited each wave; status: done | run | wait) ─────────────────────────────
+const UPDATED = "2026-08-16 · 야근 웨이브 1";
+const GOAL = "<b>이번 야근 목표:</b> Figure 1의 <b>Stage 1(Intent Analysis &amp; Planning)</b>을 thorough 하게 다시 세우고, <b>Stage 2 하위 3단계(Scene Terrain Generation &amp; Refinement)</b>까지 진행한다. 계기: 침식 버전이 여태 최선이나 ①좁은 타일에 과도한 고지대 ②맵에 물이 전혀 없음 — 되짚어 보니 <b>Stage 1을 건너뛰어</b> 지형 범주(특히 물)를 의도에서 유도하지 않고 건물 중심 분할로 직행한 게 근본 원인.";
+const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
+
+const STEPS = [
+ { stage:"Stage 1 — Intent Analysis & Planning", status:"run",
+   title:"의도 명세: 5왕국 × (Scene Type / Spatial Layout / Visual Style / Main Objects / Terrain Categories)",
+   body:`<p>논문 Stage 1은 열린 텍스트를 <b>구조화된 장면 명세</b>로 번역한다(그림 1의 5개 필드). 우리는 이걸 건너뛰고 곧장 분할로 갔다 — 그래서 지형 범주에 <b>물</b>이 없다(논문의 첫 예시부터 'frozen lake'가 1급 지형 범주다).</p>
+   <ul>
+     <li><b>Scene Type</b> — 각 왕국의 지형 성격(예: 봉화 변경=사막 협곡, 인지 첨탑=수정 고원).</li>
+     <li><b>Spatial Layout</b> — 고지/저지·물·정착지의 상대 배치("강가에 앉은 요새 마을, 고지는 서쪽").</li>
+     <li><b>Visual Style</b> — 다크판타지 저폴리 플랫셰이드 + 팔레트 4색(고정).</li>
+     <li><b>Main Objects</b> — 왕국별 주요 오브젝트(교단 시그니처 + 공통 킷).</li>
+     <li><b>Terrain Categories</b> — <b>물(강/호수) 포함</b>, 고지/사면/평지/정착지/도로 — 각 범주에 hmap 함수와 재질을 부여(Stage 2c).</li>
+   </ul>
+   <p>산출물: <code>docs/spec/stage1_intent.md</code> + <code>gen_realm_specs.py</code>의 상위 의도 블록. 이 페이지에 thoroughness 기록.</p>`,
+   rev:[] },
+
+ { stage:"Stage 2 — Global Terrain Generation", status:"wait",
+   title:"2.1 Prompt Planning — (a) 레이아웃 (b) 재질·에셋 (c) 지형 설계",
+   body:`<p>의도 명세를 실행 가능한 파라미터로 편다.</p>
+   <ul>
+     <li><b>(a) layout design</b> — 시맨틱 레이아웃 맵(구역 색). 우리 <code>viz_regions.py</code> 다이어그램 + <b>물길을 파랑으로</b> 표기.</li>
+     <li><b>(b) material & asset design</b> — 범주별 재질(팔레트 매핑) + 범주별 산포 킷 집합.</li>
+     <li><b>(c) terrain design</b> — 범주별 hmap 함수. <b>물: water_y + 하상 절개</b>, 고지: 크레스트 체인, 사면: 지맥+침식.</li>
+   </ul>`,
+   rev:[] },
+
+ { stage:"Stage 2 — Global Terrain Generation", status:"wait",
+   title:"2.2 Scene Assets Generation — 프로시저럴 킷(3070 Blender)",
+   body:`<p>논문은 GPT-Image→Hunyuan3D로 에셋을 생성. 우리는 가중치·한국 제약으로 <b>3070 Blender 프로시저럴 킷</b>으로 대체(기능 등가). 이번 웨이브에 <b>물가 에셋</b>(갈대·수변 바위·판자 다리) 발주.</p>`,
+   rev:[] },
+
+ { stage:"Stage 2 — Global Terrain Generation", status:"wait",
+   title:"2.3 Scene Terrain Generation & Refinement ← 야근 종착점",
+   body:`<p>거친 지형을 생성하고 산포한 뒤, <b>렌더-검사-수정 루프</b>로 다듬는다(논문의 VLM refinement = 우리의 codex 이미지 게이트).</p>
+   <ul>
+     <li><b>terrain generation</b> — 지질 구조(크레스트·지맥·배수) + 수력 침식 베이크 + <b>물(강/호수)</b> + <b>고지대 스케일 하향</b>.</li>
+     <li><b>3d assets scatter</b> — 범주별 접지 산포(경사 검사, 수변 식생).</li>
+     <li><b>scene refinement</b> — codex 적대적 시각 리뷰 → 지적 수용 → 재렌더(반복).</li>
+   </ul>`,
+   rev:[] },
+
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"done",
+   title:"정착지 구역 배치 (기존 완료분)",
+   body:`<p>성곽 도시 스케일에서 이미 구현: 스펙 구동 구역 분할, 건물 조립, co-deformation 접지 패드, 비겹침, 구역 위계, 안뜰 보이드, 워크스루 QA. Stage 1/2를 다시 세운 뒤 이 위에 재정렬한다.</p>`,
+   rev:[
+     {old:"균일 노이즈 진폭 튜닝으로 야생 지형 생성", new:"위치를 가진 지형 오퍼레이터 합성(랜드폼 피처)"},
+     {old:"독립된 랜드폼 피처(혹들)", new:"지질 구조(고지→지맥→배수)에서 유도 + 수력 침식 베이크"},
+     {old:"물 없음 · 좁은 타일에 과도한 고지대", new:"[진행 중] 물(강/호수) 1급 범주 도입 + 고지대 스케일 하향"},
+   ] },
+];
+
+const ICON = {done:"완료", run:"진행 중", wait:"대기"};
+document.getElementById("goal").innerHTML = GOAL;
+document.getElementById("foot").innerHTML = FOOT + "<div class='stamp' style='margin-top:10px'>갱신: " + UPDATED + "</div>";
+const wrap = document.getElementById("wrap");
+let lastStage = "";
+for (const s of STEPS) {
+  if (s.stage !== lastStage) {
+    const h = document.createElement("div"); h.className = "stage"; h.textContent = s.stage; wrap.appendChild(h); lastStage = s.stage;
+  }
+  const d = document.createElement("details"); d.className = "step st-" + s.status;
+  if (s.status === "run") d.open = true;
+  let revHtml = "";
+  if (s.rev && s.rev.length) {
+    revHtml = "<div class='rev'><h4>개정 이력</h4>" + s.rev.map(r =>
+      "<div><span class='old'>" + r.old + "</span> → <span class='new'>" + r.new + "</span></div>").join("") + "</div>";
+  }
+  d.innerHTML = "<summary><span class='dot'></span><span class='tt'>" + s.title +
+    "</span><span class='badge'>" + ICON[s.status] + "</span></summary><div class='body'>" + s.body + revHtml + "</div>";
+  wrap.appendChild(d);
+}
+</script>
+</body>
+</html>
