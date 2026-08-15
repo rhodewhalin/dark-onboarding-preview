@@ -68,13 +68,13 @@
 
 <script>
 // ── plan data (edited each wave; status: done | run | wait) ─────────────────────────────
-const UPDATED = "2026-08-16 · 야근 웨이브 1";
+const UPDATED = "2026-08-16 · 야근 웨이브 2 (Stage 1 완료 + 물 도입)";
 const GOAL = "<b>이번 야근 목표:</b> Figure 1의 <b>Stage 1(Intent Analysis &amp; Planning)</b>을 thorough 하게 다시 세우고, <b>Stage 2 하위 3단계(Scene Terrain Generation &amp; Refinement)</b>까지 진행한다. 계기: 침식 버전이 여태 최선이나 ①좁은 타일에 과도한 고지대 ②맵에 물이 전혀 없음 — 되짚어 보니 <b>Stage 1을 건너뛰어</b> 지형 범주(특히 물)를 의도에서 유도하지 않고 건물 중심 분할로 직행한 게 근본 원인.";
 const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
 
 const STEPS = [
- { stage:"Stage 1 — Intent Analysis & Planning", status:"run",
-   title:"의도 명세: 5왕국 × (Scene Type / Spatial Layout / Visual Style / Main Objects / Terrain Categories)",
+ { stage:"Stage 1 — Intent Analysis & Planning", status:"done",
+   title:"의도 명세: 5왕국 × (Scene Type / Spatial Layout / Visual Style / Main Objects / Terrain Categories) ✔ 물 포함",
    body:`<p>논문 Stage 1은 열린 텍스트를 <b>구조화된 장면 명세</b>로 번역한다(그림 1의 5개 필드). 우리는 이걸 건너뛰고 곧장 분할로 갔다 — 그래서 지형 범주에 <b>물</b>이 없다(논문의 첫 예시부터 'frozen lake'가 1급 지형 범주다).</p>
    <ul>
      <li><b>Scene Type</b> — 각 왕국의 지형 성격(예: 봉화 변경=사막 협곡, 인지 첨탑=수정 고원).</li>
@@ -83,10 +83,10 @@ const STEPS = [
      <li><b>Main Objects</b> — 왕국별 주요 오브젝트(교단 시그니처 + 공통 킷).</li>
      <li><b>Terrain Categories</b> — <b>물(강/호수) 포함</b>, 고지/사면/평지/정착지/도로 — 각 범주에 hmap 함수와 재질을 부여(Stage 2c).</li>
    </ul>
-   <p>산출물: <code>docs/spec/stage1_intent.md</code> + <code>gen_realm_specs.py</code>의 상위 의도 블록. 이 페이지에 thoroughness 기록.</p>`,
-   rev:[] },
+   <p>산출물: <code>docs/spec/stage1_intent.md</code>(작성 완료) + <code>gen_realm_specs.py</code>의 <code>INTENT</code>/<code>WATER</code> 테이블 → 스펙 v3의 <code>intent</code>/<code>world.water</code>. <b>thoroughness</b>: 5왕국 전부 5개 필드 명세, 물(강/호수/오아시스/운하/산정호)을 1급 지형 범주로 포함, 스펙 재생성·분할 불변식 통과.</p>`,
+   rev:[{old:"지형 범주에 물 없음(Stage 1 건너뜀)", new:"물을 1급 지형 범주로 · 왕국별 water 명세"}] },
 
- { stage:"Stage 2 — Global Terrain Generation", status:"wait",
+ { stage:"Stage 2 — Global Terrain Generation", status:"done",
    title:"2.1 Prompt Planning — (a) 레이아웃 (b) 재질·에셋 (c) 지형 설계",
    body:`<p>의도 명세를 실행 가능한 파라미터로 편다.</p>
    <ul>
@@ -96,20 +96,21 @@ const STEPS = [
    </ul>`,
    rev:[] },
 
- { stage:"Stage 2 — Global Terrain Generation", status:"wait",
+ { stage:"Stage 2 — Global Terrain Generation", status:"done",
    title:"2.2 Scene Assets Generation — 프로시저럴 킷(3070 Blender)",
-   body:`<p>논문은 GPT-Image→Hunyuan3D로 에셋을 생성. 우리는 가중치·한국 제약으로 <b>3070 Blender 프로시저럴 킷</b>으로 대체(기능 등가). 이번 웨이브에 <b>물가 에셋</b>(갈대·수변 바위·판자 다리) 발주.</p>`,
+   body:`<p>논문은 GPT-Image→Hunyuan3D로 에셋을 생성. 우리는 가중치·한국 제약으로 <b>3070 Blender 프로시저럴 킷</b>으로 대체(기능 등가). 라운드20 <b>물가 에셋</b> <code>reed_cluster</code>·<code>plank_bridge</code> 발주→즉시 납품→<code>WorldKit()</code> 자동 편입. 킷 42종.</p>`,
    rev:[] },
 
- { stage:"Stage 2 — Global Terrain Generation", status:"wait",
-   title:"2.3 Scene Terrain Generation & Refinement ← 야근 종착점",
-   body:`<p>거친 지형을 생성하고 산포한 뒤, <b>렌더-검사-수정 루프</b>로 다듬는다(논문의 VLM refinement = 우리의 codex 이미지 게이트).</p>
+ { stage:"Stage 2 — Global Terrain Generation", status:"done",
+   title:"2.3 Scene Terrain Generation & Refinement ← 야근 종착점 ✔",
+   body:`<p>거친 지형 생성→산포→<b>렌더-검사-수정 루프</b>(논문 VLM refinement = codex 이미지 게이트). 이번 야근 도달점.</p>
    <ul>
-     <li><b>terrain generation</b> — 지질 구조(크레스트·지맥·배수) + 수력 침식 베이크 + <b>물(강/호수)</b> + <b>고지대 스케일 하향</b>.</li>
-     <li><b>3d assets scatter</b> — 범주별 접지 산포(경사 검사, 수변 식생).</li>
-     <li><b>scene refinement</b> — codex 적대적 시각 리뷰 → 지적 수용 → 재렌더(반복).</li>
-   </ul>`,
-   rev:[] },
+     <li><b>terrain generation</b> ✔ — 지질 구조(크레스트·지맥·배수) + 수력 침식 베이크(MIT 알고리즘 각색) + <b>물(강/호수/오아시스/산정호)</b> 절개+수면 평면 + <b>고지대 range_h 4~7로 하향</b>.</li>
+     <li><b>3d assets scatter</b> ✔ — 범주별 접지 산포(경사 검사) + 수변 갈대 + 도로-강 교차 다리.</li>
+     <li><b>scene refinement</b> ✔(1라운드) — codex 판정: 물 통합 archive·cognition YES, oathbound·beacon PARTIAL. beacon 오아시스 분지화·수면 광택 하향 반영.</li>
+   </ul>
+   <p><b>남은 리파인(다음 웨이브):</b> codex 최대 잔여 지적 = "정착지 footprint가 너무 직각·평탄한 슬랩(성벽 사각형)" → 성벽·테라스 가장자리 유기화. 물 자체는 양호.</p>`,
+   rev:[{old:"물 없음 · 좁은 타일 과도 고지대", new:"강·호수 도입 + 고지대 하향 + 수력 침식으로 지질 서사"}] },
 
  { stage:"Stage 3 — Regional Object Generation & Placement", status:"done",
    title:"정착지 구역 배치 (기존 완료분)",
