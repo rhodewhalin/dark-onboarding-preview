@@ -125,17 +125,19 @@ const STEPS = [
      <div><span class="old">구역 = 건물 중심 분할(threshold/spine/core/precinct)</span> → <span class="new">기능 구역(광장·주거·보급·수변 어촌 등) + 물·지형 인지 배치</span></div>
    </div>` },
 
- { stage:"Stage 3 — Regional Object Generation & Placement", status:"wait",
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"run",
    title:"3.1 Region Planning — 기능 구역 분할 (divide regions)",
-   body:`<p>맵을 <b>기능이 다른 구역</b>으로 나눈다(논문 예: Festival Plaza·Cabin Village·Supply Site·Fishing Village). 우리판: 시민 광장·주거 지구·보급/시장·<b>수변 어촌(부두)</b>·성소 등 — 물·지형에 맞춰 배치(수변엔 어촌·부두, 고지엔 방어·봉화).</p>` },
+   body:`<p>맵을 <b>기능이 다른 구역</b>으로 나눈다(논문 예: Festival Plaza·Cabin Village·Supply Site·Fishing Village). 우리판: 시민 광장·주거 지구·보급/시장·<b>수변 어촌(부두)</b>·성소 등.</p>
+   <ul><li>✔ <b>수변 어촌</b> 신설 — 호숫가 은행에 어부 오두막 + 핑거 부두(물로 뻗음) + 건조대 + 갈대(<code>DressWaterfront</code>). 논문 Fishing Village 대응, 물과 관계 맺는 첫 기능 구역.</li>
+     <li>기존 구역(광장·주거·보급·성소)은 옛 town 시스템을 물·지형 인지로 재편 예정.</li></ul>` },
 
- { stage:"Stage 3 — Regional Object Generation & Placement", status:"wait",
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"run",
    title:"3.2 Terrain-Aware Rendering & Placement — 구역별 지형 인지 배치",
-   body:`<p>구역마다 오브젝트를 <b>지형을 인지해</b> 배치(논문: region 렌더→오브젝트 검출→3D 배치, 지형에 자세 맞춤). 우리판: 스펙 구동 배치 + co-deformation 접지 패드 + 비겹침 + <b>물 인지</b>(물에 건물 안 놓고, 수변엔 부두·갈대) + 경사 접지.</p>` },
+   body:`<p>오브젝트를 <b>지형·물을 인지해</b> 배치. ✔ 수변: 은행 접지(경사 검사)·부두는 수면 위·건물은 물 밖. ✔ 지면식생 <code>scrub_tuft</code>로 식생 구역을 기하로. 남음: 도심 구역 자체를 물·새 지형에 맞춰 재정렬.</p>` },
 
- { stage:"Stage 3 — Regional Object Generation & Placement", status:"wait",
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"run",
    title:"3.3 Scene Refinement — 구역별 정련 루프 (pose/scale/collision/quality)",
-   body:`<p>구역을 하나씩 근접 렌더해 <b>자세·스케일·충돌·품질</b>을 점검·수정(논문: for region in a,b,c,d). 우리판: 워크스루 QA + codex 적대적 시각 리뷰를 구역 단위로. <b>중간검토 필수</b>.</p>` },
+   body:`<p>구역별 근접 렌더 → <b>자세·스케일·충돌·품질</b> 점검·수정. ✔ codex 중간검토: 재질구역 YES, 수변 SOMEWHAT→핑거부두·건조대 보강. <b>중간검토 계속</b>. 남음: 도심 재정렬 후 전체 워크스루 QA.</p>` },
 ];
 
 const ICON = {done:"완료", run:"진행 중", wait:"대기"};
