@@ -68,7 +68,7 @@
 
 <script>
 // ── plan data (edited each wave; status: done | run | wait) ─────────────────────────────
-const UPDATED = "2026-08-16 · 야근 웨이브 2 (Stage 1 완료 + 물 도입)";
+const UPDATED = "2026-08-16 · 야근 웨이브 3 (Stage 2 감사·보강 + Stage 3 재정의)";
 const GOAL = "<b>이번 야근 목표:</b> Figure 1의 <b>Stage 1(Intent Analysis &amp; Planning)</b>을 thorough 하게 다시 세우고, <b>Stage 2 하위 3단계(Scene Terrain Generation &amp; Refinement)</b>까지 진행한다. 계기: 침식 버전이 여태 최선이나 ①좁은 타일에 과도한 고지대 ②맵에 물이 전혀 없음 — 되짚어 보니 <b>Stage 1을 건너뛰어</b> 지형 범주(특히 물)를 의도에서 유도하지 않고 건물 중심 분할로 직행한 게 근본 원인.";
 const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
 
@@ -107,19 +107,35 @@ const STEPS = [
    <ul>
      <li><b>terrain generation</b> ✔ — 지질 구조(크레스트·지맥·배수) + 수력 침식 베이크(MIT 알고리즘 각색) + <b>물(강/호수/오아시스/산정호)</b> 절개+수면 평면 + <b>고지대 range_h 4~7로 하향</b>.</li>
      <li><b>3d assets scatter</b> ✔ — 범주별 접지 산포(경사 검사) + 수변 갈대 + 도로-강 교차 다리.</li>
-     <li><b>scene refinement</b> ✔(1라운드) — codex 판정: 물 통합 archive·cognition YES, oathbound·beacon PARTIAL. beacon 오아시스 분지화·수면 광택 하향 반영.</li>
+     <li><b>scene refinement</b> ✔(다회) — codex 게이트: 물 통합 archive·cognition YES. <b>Stage 2 전체 감사(논문 Figure 대조)</b>: 세 하위스텝 PARTIAL → 재질구역/산포 보강 중.</li>
    </ul>
-   <p><b>남은 리파인(다음 웨이브):</b> codex 최대 잔여 지적 = "정착지 footprint가 너무 직각·평탄한 슬랩(성벽 사각형)" → 성벽·테라스 가장자리 유기화. 물 자체는 양호.</p>`,
+   <div class="rev"><h4>Stage 2 감사 (논문 Figure 대조) · 개정</h4>
+     <div><span class="old">재질구역: 왕국마다 단색 지면</span> → <span class="new">바이옴별 지면색(숲/모래/암반/협곡) — 정점색 한계까지, 3070 지면식생으로 마저</span></div>
+     <div><span class="old">산포: 성기고 격자형</span> → <span class="new">클러스터 군집(그로브·바위밭), 캡 66</span></div>
+     <div><span class="old">정련: 1~2라운드</span> → <span class="new">codex 다회 + 라운드22 3070 발주(scrub_tuft·dock_platform)</span></div>
+   </div>
+   <p><b>남은 리파인:</b> 정점색만으론 재질구역이 포그·조명에 눌림 → 3070 <code>scrub_tuft</code> 지면 식생으로 구역을 기하로 읽히게(대기). 성벽 직각 슬랩은 Stage 3 재정렬에서 함께.</p>`,
    rev:[{old:"물 없음 · 좁은 타일 과도 고지대", new:"강·호수 도입 + 고지대 하향 + 수력 침식으로 지질 서사"}] },
 
- { stage:"Stage 3 — Regional Object Generation & Placement", status:"done",
-   title:"정착지 구역 배치 (기존 완료분)",
-   body:`<p>성곽 도시 스케일에서 이미 구현: 스펙 구동 구역 분할, 건물 조립, co-deformation 접지 패드, 비겹침, 구역 위계, 안뜰 보이드, 워크스루 QA. Stage 1/2를 다시 세운 뒤 이 위에 재정렬한다.</p>`,
-   rev:[
-     {old:"균일 노이즈 진폭 튜닝으로 야생 지형 생성", new:"위치를 가진 지형 오퍼레이터 합성(랜드폼 피처)"},
-     {old:"독립된 랜드폼 피처(혹들)", new:"지질 구조(고지→지맥→배수)에서 유도 + 수력 침식 베이크"},
-     {old:"물 없음 · 좁은 타일에 과도한 고지대", new:"[진행 중] 물(강/호수) 1급 범주 도입 + 고지대 스케일 하향"},
-   ] },
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"wait",
+   title:"⟳ 재정의 — 기존 도심 배치를 걷어내고 논문 3스텝으로 다시 세움",
+   body:`<p><s>기존: 성곽 도시 스케일에서 스펙 구동 구역 분할·건물 조립·접지 패드·위계·안뜰 등 "완료"로 뒀던 분량.</s> → 이 배치는 <b>물·지질 지형이 없던 옛 지형 위에</b> 세워졌다. Stage 1/2를 새로 세웠으니, 논문 Figure 1의 Stage 3 세 스텝으로 <b>다시 정렬</b>한다(아래). 기존 도심 조립 로직 자체는 자산이지만, 이제 <b>물·지형을 인지</b>하고 <b>기능 구역</b>으로 재편해야 한다.</p>
+   <div class="rev"><h4>개정 이력</h4>
+     <div><span class="old">Stage 3 = "완료"로 표기</span> → <span class="new">논문 3스텝으로 재정의·재진행 (미착수)</span></div>
+     <div><span class="old">구역 = 건물 중심 분할(threshold/spine/core/precinct)</span> → <span class="new">기능 구역(광장·주거·보급·수변 어촌 등) + 물·지형 인지 배치</span></div>
+   </div>` },
+
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"wait",
+   title:"3.1 Region Planning — 기능 구역 분할 (divide regions)",
+   body:`<p>맵을 <b>기능이 다른 구역</b>으로 나눈다(논문 예: Festival Plaza·Cabin Village·Supply Site·Fishing Village). 우리판: 시민 광장·주거 지구·보급/시장·<b>수변 어촌(부두)</b>·성소 등 — 물·지형에 맞춰 배치(수변엔 어촌·부두, 고지엔 방어·봉화).</p>` },
+
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"wait",
+   title:"3.2 Terrain-Aware Rendering & Placement — 구역별 지형 인지 배치",
+   body:`<p>구역마다 오브젝트를 <b>지형을 인지해</b> 배치(논문: region 렌더→오브젝트 검출→3D 배치, 지형에 자세 맞춤). 우리판: 스펙 구동 배치 + co-deformation 접지 패드 + 비겹침 + <b>물 인지</b>(물에 건물 안 놓고, 수변엔 부두·갈대) + 경사 접지.</p>` },
+
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"wait",
+   title:"3.3 Scene Refinement — 구역별 정련 루프 (pose/scale/collision/quality)",
+   body:`<p>구역을 하나씩 근접 렌더해 <b>자세·스케일·충돌·품질</b>을 점검·수정(논문: for region in a,b,c,d). 우리판: 워크스루 QA + codex 적대적 시각 리뷰를 구역 단위로. <b>중간검토 필수</b>.</p>` },
 ];
 
 const ICON = {done:"완료", run:"진행 중", wait:"대기"};
