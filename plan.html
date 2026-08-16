@@ -90,7 +90,7 @@
 
 <script>
 // ── plan data (edited each wave; status: done | run | wait) ─────────────────────────────
-const UPDATED = "2026-08-16 14:30 · 웨이브 8 (§4W.1 루프 #10 — 텍스처 배선, 정점색 천장 돌파)";
+const UPDATED = "2026-08-16 15:10 · 웨이브 9 (§4W.1 루프 #11~#12 — wood 배선·재질구역 MET, 4/6 MET 수렴)";
 // §4W.1 refinement loop — a running verification HOOK (codex scores the 6 criteria each wave).
 // This is the "loop" of the paper's Stage 2.3; it does not stall — each iteration logs verdicts,
 // the lowest criterion becomes the next action, and the fix is verified in the next iteration.
@@ -115,7 +115,11 @@ const LOOPLOG = [
   { iter:9, ts:"2026-08-16 04:20", scores:["PARTIAL","PARTIAL","MET","MET","PARTIAL","MET"],
     priority:"(텍스처 대기)", action:"지질: 스커트로 좌/전면 완만. 재질·무아티팩트는 R25 텍스처 도착 후 재개(정점색 천장)" },
   { iter:10, ts:"2026-08-16 14:30", scores:["PARTIAL","PARTIAL↑","MET","MET","PARTIAL↑","MET"],
-    priority:"도로 형상/wood 재베이크", action:"R25 텍스처 배선(팔레트 4중 3+지면 디테일, wood는 게이트 REVISE→재발주). 지면 자갈 결·석벽 돌 결로 정점색 천장 돌파 — 재질·무아티팩트 개선(도로가 아직 직사각형·마일드 타일링 잔존). wood 재베이크(R25c)+도로 형상이 다음" },
+    priority:"wood 재베이크/도로", action:"R25 텍스처 배선(팔레트 3+지면 디테일, wood는 게이트 REVISE). 지면 자갈·석벽 돌 결로 정점색 천장 돌파" },
+  { iter:11, ts:"2026-08-16 15:00", scores:["PARTIAL","MET","MET","MET","PARTIAL","MET"],
+    priority:"무아티팩트", action:"wood 무옹이 최종본(R25f) 게이트 PASS→배선(4/4). 전 표면 텍스처로 재질구역 PARTIAL→MET(4/6 MET). 잔여=도로 직사각형+지면 타일 반복(눈높이)" },
+  { iter:12, ts:"2026-08-16 15:10", scores:["PARTIAL","MET","MET","MET","PARTIAL↑","MET"],
+    priority:"(수렴)", action:"지면 디테일 2옥타브로 타일 반복 주기 완화(무아티팩트↑). 남은 2 PARTIAL은 본질적: 무아티팩트=도로가 도로라 strip·타일은 타일, 지질=고지가 실제 가파른 산. 텍스처/지형 레버 소진" },
 ];
 const GOAL = "<b>이번 야근 목표:</b> Figure 1의 <b>Stage 1(Intent Analysis &amp; Planning)</b>을 thorough 하게 다시 세우고, <b>Stage 2 하위 3단계(Scene Terrain Generation &amp; Refinement)</b>까지 진행한다. 계기: 침식 버전이 여태 최선이나 ①좁은 타일에 과도한 고지대 ②맵에 물이 전혀 없음 — 되짚어 보니 <b>Stage 1을 건너뛰어</b> 지형 범주(특히 물)를 의도에서 유도하지 않고 건물 중심 분할로 직행한 게 근본 원인.";
 const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
