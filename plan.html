@@ -90,7 +90,7 @@
 
 <script>
 // ── plan data (edited each wave; status: done | run | wait) ─────────────────────────────
-const UPDATED = "2026-08-16 16:40 · 웨이브 12 (§4W.1 루프 #15 — 애추 배선, 6기준 전부 MET 완전 수렴)";
+const UPDATED = "2026-08-16 17:00 · 웨이브 13 (Stage 4 제출·인프라 트랙 추가 — 남은 작업 정리)";
 // §4W.1 refinement loop — a running verification HOOK (codex scores the 6 criteria each wave).
 // This is the "loop" of the paper's Stage 2.3; it does not stall — each iteration logs verdicts,
 // the lowest criterion becomes the next action, and the fix is verified in the next iteration.
@@ -128,7 +128,7 @@ const LOOPLOG = [
     priority:"— 루프 수렴(6/6 MET) —", action:"3070 scree_apron·cliff_buttress(R25i-j)를 DressScree로 급사면 기부에 배선(애추 치마+수직 스퍼) → 벽 같은 접촉 해소, 침식된 지형으로 읽힘. **지질정합성 PARTIAL→MET. 6기준 전부 MET.** §4W.1 정련 루프 15회 만에 완전 수렴." },
 ];
 const GOAL = "<b>이번 야근 목표:</b> Figure 1의 <b>Stage 1(Intent Analysis &amp; Planning)</b>을 thorough 하게 다시 세우고, <b>Stage 2 하위 3단계(Scene Terrain Generation &amp; Refinement)</b>까지 진행한다. 계기: 침식 버전이 여태 최선이나 ①좁은 타일에 과도한 고지대 ②맵에 물이 전혀 없음 — 되짚어 보니 <b>Stage 1을 건너뛰어</b> 지형 범주(특히 물)를 의도에서 유도하지 않고 건물 중심 분할로 직행한 게 근본 원인.";
-const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
+const GOAL2_DONE=1; const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
 
 const STEPS = [
  { stage:"Stage 1 — Intent Analysis & Planning", status:"done",
@@ -193,9 +193,29 @@ const STEPS = [
    title:"3.2 Terrain-Aware Rendering & Placement — 구역별 지형 인지 배치",
    body:`<p>오브젝트를 <b>지형·물을 인지해</b> 배치. ✔ 수변: 은행 접지(경사 검사)·부두는 수면 위·건물은 물 밖. ✔ 지면식생 <code>scrub_tuft</code>로 식생 구역을 기하로. ✔ <b>수변 게이트 + 부두 창고 구역</b>(03:00)으로 도심을 물에 연결(기능구역 FAIL→PARTIAL). 남음: 광장·주거·보급 구역도 물·경사 등고선 따라 정렬.</p>`, ts:"2026-08-16 03:00" },
 
- { stage:"Stage 3 — Regional Object Generation & Placement", status:"run",
-   title:"3.3 Scene Refinement — 구역별 정련 루프 (pose/scale/collision/quality)",
-   body:`<p>구역별 근접 렌더 → <b>자세·스케일·충돌·품질</b> 점검·수정. ✔ codex 중간검토: 재질구역 YES, 수변 SOMEWHAT→핑거부두·건조대 보강. <b>중간검토 계속</b>. 남음: 도심 재정렬 후 전체 워크스루 QA.</p>`, ts:"2026-08-16 02:15" },
+ { stage:"Stage 3 — Regional Object Generation & Placement", status:"done",
+   title:"3.3 Scene Refinement — §4W.1 정련 루프 수렴 (6/6 MET)",
+   body:`<p>구역별 근접 렌더 → 자세·스케일·충돌·품질을 codex 적대적 리뷰로 점검·수정. <b>§4W.1 정련 루프 15회 반복으로 6기준 전부 MET</b>(위 루프 로그 참조): 지질정합성·재질구역·물신뢰성·접지·무아티팩트·기능구역. 텍스처 베이크·애추 사면·도로 사행·수변 게이트까지 반영. 표현/에셋 트랙 수렴.</p>`, ts:"2026-08-16 16:40" },
+
+ { stage:"Stage 4 — 제출·인프라 (게임 파이프라인 밖, 배포·검증)", status:"run",
+   title:"클라이언트 정적 빌드 / 서버 / 프로토콜",
+   body:`<p>제출 대조표 기준 <b>완료</b>: Unity Web 배치 빌드(<code>dist/web/</code>, 재현 <code>scripts/unity-env.sh build</code>) · 서버 소스(<code>server/</code> TS) + 공유 스키마(<code>protocol/</code>) · Dockerfile·compose <b>정의</b>(구동 미검증).</p>`, ts:"2026-08-13" },
+
+ { stage:"Stage 4 — 제출·인프라 (게임 파이프라인 밖, 배포·검증)", status:"wait",
+   title:"⏳ Docker 컨테이너 검증 (이 노드 Docker 미설치)",
+   body:`<p><code>docker compose up --build</code>로 컨테이너 기동 + <code>/healthz</code>=ok 확인(runbook §6). <b>이 머신에 Docker 미설치</b>라 여기서 실행 불가 — 실행 가능한 환경 필요.</p>` },
+
+ { stage:"Stage 4 — 제출·인프라 (게임 파이프라인 밖, 배포·검증)", status:"wait",
+   title:"⏳ KIPlay 허브 통합 (2~4인 PvPvE·승자 결정 실증)",
+   body:`<p>허브 <code>games.json</code>에 <code>dark-onboarding-rpg</code> 등록 + 허브 compose 서비스 추가 + <b>실 Chrome으로 허브 경유 매치 완주</b> → 서버 권위 리더보드 기록(runbook §7). 핵심 요구의 실증 관문, 미검증.</p>` },
+
+ { stage:"Stage 4 — 제출·인프라 (게임 파이프라인 밖, 배포·검증)", status:"wait",
+   title:"⏳ GCP 배포 · 최종 검증 웨이브 F1~F4 · 문서 프리즈",
+   body:`<p>GCP Compute Engine 파라미터화 배포 + 헬스체크 실측(runbook §8). 그 후 <b>F1~F4</b>(수용 기준 전수 감사 · 코드/보안 리뷰 · 실 브라우저 수동 QA · 제품 범위 확인). 통과 시 README/runbook/submission/CHANGELOG의 PENDING 해제·프리즈 + HANDOFF 완료 항목.</p>
+   <div class="rev"><h4>주의 (오너 확인 필요)</h4>
+     <div class="logline"><span class="ts">미확인</span> <span class="new">제출 마감 정확 일시</span></div>
+     <div class="logline"><span class="ts">2026-08-26</span> <span class="new">오너 지정 구현 동결일</span></div>
+   </div>` },
 ];
 
 const ICON = {done:"완료", run:"진행 중", wait:"대기"};
