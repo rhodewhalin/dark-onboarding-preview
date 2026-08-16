@@ -90,7 +90,7 @@
 
 <script>
 // ── plan data (edited each wave; status: done | run | wait) ─────────────────────────────
-const UPDATED = "2026-08-16 03:05 · 야근 웨이브 5 (도심 물 인지 재정렬 + §4W.1 정련 루프 상시 가동)";
+const UPDATED = "2026-08-16 03:50 · 야근 웨이브 6 (§4W.1 루프 #4~#7: 물·기능 MET, 재질/아티팩트 정점색 천장까지)";
 // §4W.1 refinement loop — a running verification HOOK (codex scores the 6 criteria each wave).
 // This is the "loop" of the paper's Stage 2.3; it does not stall — each iteration logs verdicts,
 // the lowest criterion becomes the next action, and the fix is verified in the next iteration.
@@ -101,7 +101,15 @@ const LOOPLOG = [
   { iter:2, ts:"2026-08-16 02:55", scores:["PARTIAL","PARTIAL","PARTIAL","MET","PARTIAL","PARTIAL"],
     priority:"물신뢰성", action:"수변 게이트+부두 편입으로 기능구역 FAIL→PARTIAL. 다음: 연속적 물가·번짐 제거·부두를 수면 위 기둥 데크로" },
   { iter:3, ts:"2026-08-16 03:05", scores:["PARTIAL","PARTIAL","PARTIAL→개선","MET","PARTIAL","PARTIAL"],
-    priority:"(재검증 대기)", action:"물을 의도 강·호수로 한정(번짐 제거)+부두 수면 위로. 다음 웨이브 codex 재채점 예정" },
+    priority:"(재검증)", action:"물을 의도 강·호수로 한정(번짐 제거)+부두 수면 위로" },
+  { iter:4, ts:"2026-08-16 03:20", scores:["PARTIAL","PARTIAL","MET","MET","PARTIAL","MET"],
+    priority:"재질구역", action:"물신뢰성·기능구역 MET 확정(3 MET). 도심 내부가 균일 평탄 pad → 흙/자갈 변주 주입" },
+  { iter:5, ts:"2026-08-16 03:30", scores:["PARTIAL","PARTIAL","MET","MET","PARTIAL","MET"],
+    priority:"재질구역", action:"내부 지면 변주 넣음. 남은 원인=중앙 spine이 단색 연보라 직사각형 → 도로를 정점색 자갈 그리드로" },
+  { iter:6, ts:"2026-08-16 03:40", scores:["PARTIAL","PARTIAL","MET","MET","PARTIAL","MET"],
+    priority:"무아티팩트", action:"도로 자갈 그리드로 부감 도로/지면 분리됨. 도로가 아직 깔끔한 직사각형 → 폭 불규칙화+대비 강화" },
+  { iter:7, ts:"2026-08-16 03:50", scores:["PARTIAL","PARTIAL","MET","MET","PARTIAL","MET"],
+    priority:"조명/텍스처 레버", action:"도로 불규칙화. codex 판정: 정점색 조명 천장 도달(추가 정점 튜닝은 diminishing). 남은 재질/아티팩트는 텍스처 베이크 or 앰비언트 리밸런스, 지질(절벽-도심 급단)은 지형 apron 필요 — 다음 웨이브 레버" },
 ];
 const GOAL = "<b>이번 야근 목표:</b> Figure 1의 <b>Stage 1(Intent Analysis &amp; Planning)</b>을 thorough 하게 다시 세우고, <b>Stage 2 하위 3단계(Scene Terrain Generation &amp; Refinement)</b>까지 진행한다. 계기: 침식 버전이 여태 최선이나 ①좁은 타일에 과도한 고지대 ②맵에 물이 전혀 없음 — 되짚어 보니 <b>Stage 1을 건너뛰어</b> 지형 범주(특히 물)를 의도에서 유도하지 않고 건물 중심 분할로 직행한 게 근본 원인.";
 const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
