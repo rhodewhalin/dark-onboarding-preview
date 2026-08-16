@@ -90,7 +90,7 @@
 
 <script>
 // ── plan data (edited each wave; status: done | run | wait) ─────────────────────────────
-const UPDATED = "2026-08-16 04:20 · 야근 웨이브 7 (§4W.1 루프 #8~#9 + 텍스처 베이크 발주 R25)";
+const UPDATED = "2026-08-16 14:30 · 웨이브 8 (§4W.1 루프 #10 — 텍스처 배선, 정점색 천장 돌파)";
 // §4W.1 refinement loop — a running verification HOOK (codex scores the 6 criteria each wave).
 // This is the "loop" of the paper's Stage 2.3; it does not stall — each iteration logs verdicts,
 // the lowest criterion becomes the next action, and the fix is verified in the next iteration.
@@ -113,7 +113,9 @@ const LOOPLOG = [
   { iter:8, ts:"2026-08-16 04:10", scores:["PARTIAL→개선","PARTIAL","MET","MET","PARTIAL","MET"],
     priority:"지질정합성", action:"앰비언트 레버 테스트→지면이 직접광 지배라 미미, 되돌림(크러시 방지). 지형 apron: 도심→산 전이를 24m 산기슭 스커트로 넓힘. 재질/아티팩트는 텍스처 발주(R25)에 의존" },
   { iter:9, ts:"2026-08-16 04:20", scores:["PARTIAL","PARTIAL","MET","MET","PARTIAL","MET"],
-    priority:"(텍스처 대기)", action:"지질: 스커트로 좌/전면 완만해짐. 우/후면 고지는 본질적으로 가파른 산이라 잔존 PARTIAL. 재질·무아티팩트는 R25 텍스처 베이크 도착 후 재개(정점색으론 천장). 루프 수렴: 3 MET, 3 PARTIAL(텍스처/지형 본질 의존)" },
+    priority:"(텍스처 대기)", action:"지질: 스커트로 좌/전면 완만. 재질·무아티팩트는 R25 텍스처 도착 후 재개(정점색 천장)" },
+  { iter:10, ts:"2026-08-16 14:30", scores:["PARTIAL","PARTIAL↑","MET","MET","PARTIAL↑","MET"],
+    priority:"도로 형상/wood 재베이크", action:"R25 텍스처 배선(팔레트 4중 3+지면 디테일, wood는 게이트 REVISE→재발주). 지면 자갈 결·석벽 돌 결로 정점색 천장 돌파 — 재질·무아티팩트 개선(도로가 아직 직사각형·마일드 타일링 잔존). wood 재베이크(R25c)+도로 형상이 다음" },
 ];
 const GOAL = "<b>이번 야근 목표:</b> Figure 1의 <b>Stage 1(Intent Analysis &amp; Planning)</b>을 thorough 하게 다시 세우고, <b>Stage 2 하위 3단계(Scene Terrain Generation &amp; Refinement)</b>까지 진행한다. 계기: 침식 버전이 여태 최선이나 ①좁은 타일에 과도한 고지대 ②맵에 물이 전혀 없음 — 되짚어 보니 <b>Stage 1을 건너뛰어</b> 지형 범주(특히 물)를 의도에서 유도하지 않고 건물 중심 분할로 직행한 게 근본 원인.";
 const FOOT = "핵심 인사이트: <i>coarse-to-fine agentic framework for building explicit, explorable, and editable 3D worlds from open-ended text.</i> — 우리도 거친 지형 골조(Stage 2)부터 세우고 점진적으로 조밀화(Stage 3)하되, 그 출발점인 의도 명세(Stage 1)를 먼저 제대로 닫는다.";
